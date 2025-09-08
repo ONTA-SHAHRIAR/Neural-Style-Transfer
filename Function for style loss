@@ -1,0 +1,14 @@
+ def gram_matrix(x):
+ x 
+= tf.transpose(x, (2, 0, 1))
+ features = tf.reshape(x, (tf.shape(x)[0], -1))
+ gram = tf.matmul(features, tf.transpose(features))
+ return gram
+ def style_loss(style_img, combination_img):
+ S 
+= gram_matrix(style_img)
+ C 
+= gram_matrix(combination_img)
+ channels = 3
+ size = img_height * img_width
+ return tf.reduce_sum(tf.square(S - C)) / (4.0 * (channels ** 2) * (size ** 2))
