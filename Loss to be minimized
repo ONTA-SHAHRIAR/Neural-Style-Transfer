@@ -1,0 +1,34 @@
+ style_layer_names = [   
+"block1_conv1",
+ "block2_conv1",
+ "block3_conv1",
+ "block4_conv1",
+ "block5_conv1",
+ ]
+ content_layer_name = "block5_conv2"   
+total_variation_weight = 1e-6
+ style_weight = 1e-6    
+content_weight = 2.5e-8   
+ def compute_loss(combination_image, base_image, style_reference_image):
+    input_tensor = tf.concat(
+ [base_image, style_reference_image, combination_image], axis=0)
+    features = feature_extractor(input_tensor)
+    loss = tf.zeros(shape=())  
+    layer_features = features[content_layer_name]       
+    base_image_features = layer_features[0, :, :, :]    
+    combination_features = layer_features[2, :, :, :]   
+    loss = loss + content_weight * content_loss(        
+base_image_features, combination_features       
+    )
+ for layer_name in style_layer_names:                                    
+layer_features = features[layer_name]                               
+style_reference_features = layer_features[1, :, :, :]               
+combination_features = layer_features[2, :, :, :]                   
+style_loss_value = style_loss(                                      
+    style_reference_features, combination_features)                 
+loss += (style_weight / len(style_layer_names)) * style_loss_value  
+Add the 
+content 
+loss.
+    loss += total_variation_weight * total_variation_loss(combination_image)
+ return loss
